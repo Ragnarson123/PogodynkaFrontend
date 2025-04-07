@@ -10,22 +10,17 @@ const Form = ({
                   fields,
                   endpoint,
                   onSubmit,
-
               }) => {
     const [formFields, setFormFields] = React.useState([]);
     const onFormSubmit = async (e) => {
         e.preventDefault();
-        console.log("Form submitted - before calling onSubmit");
-        console.log("Form fields:", formFields); // ← pokaże wszystkie pola
         try {
             const formData = formFields.reduce((acc, field) => {
                 acc[field.name] = field.value;
                 return acc;
             }, {});
-            console.log("Form data:", formData); // ← to co idzie do API
 
             await onSubmit(formData, endpoint);
-            console.log("Form submitted - after calling onSubmit");
         } catch (error) {
             console.error("Error in form submission:", error);
         }

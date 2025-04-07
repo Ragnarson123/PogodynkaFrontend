@@ -3,6 +3,8 @@ import "./globals.css";
 import React from "react";
 import Navigation from "@/components/Navigation";
 import { styles } from "@/styles";
+import { Providers } from "./providers";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,8 +28,10 @@ export default function RootLayout({ children }) {
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable}  ${styles.bodyBgColor} ${styles.textDefault} antialiased lg:h-screen lg:overflow-y-hidden relative`}
       >
-        <Navigation />
+      <Providers>
+      <Navigation />
         {children}
+      </Providers>
       </body>
     </html>
   );

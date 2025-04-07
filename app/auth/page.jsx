@@ -6,8 +6,17 @@ import Link from "next/link";
 import AuthenticationForms from "@/components/AuthenticationForms";
 import PopUpContainer from "@/components/PopUpContainer";
 import OverlayContainer from "@/components/OverlayContainer";
-
+import { useSelector } from "react-redux";
 export default function Auth() {
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  if (isAuthenticated) {
+    return (
+        <div className="text-center p-4 text-lg text-green-500">
+          You successfully logged in.
+        </div>
+    );
+  }
+
   return (
     <OuterContainer className={"lg:h-[calc(100vh-8rem)] h-fit"}>
       <div

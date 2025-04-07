@@ -7,11 +7,17 @@ import { AnimatePresence, motion } from "framer-motion";
 import Form from "@/components/Form";
 import PopUpContainer from "@/components/PopUpContainer";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { login } from "@/redux/authSlice";
+import { useSelector } from "react-redux";
 
 
 const AuthenticationForms = ({ className = "" }) => {
   const [selectedFormTypeIndex, setSelectedFormTypeIndex] = useState(0);
   const router = useRouter();
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+
 
   const forms = [
     {
@@ -43,8 +49,6 @@ const AuthenticationForms = ({ className = "" }) => {
     },
   ];
   const handleFormSubmit = async (formData, endpoint) => {
-    console.log('Dane formularza:', formData);
-    console.log('Endpoint:', endpoint);
     try {
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -55,12 +59,13 @@ const AuthenticationForms = ({ className = "" }) => {
       });
 
       if (response.ok) {
+        const data = await response.json();
+
         if (selectedFormTypeIndex === 1) {
-          const data = await response.json();
-          localStorage.setItem('token', data.token);
+          dispatch(login(data.token));
           router.push('/');
         } else {
-          alert('Registration successful!');
+          router.push('/');
           setSelectedFormTypeIndex(1);
         }
       } else {
@@ -72,6 +77,7 @@ const AuthenticationForms = ({ className = "" }) => {
       alert('An error occurred.');
     }
   };
+
 
   return (
       <PopUpContainer

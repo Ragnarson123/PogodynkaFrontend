@@ -6,16 +6,23 @@ import { usePathname } from "next/navigation";
 import OuterContainer from "@/components/OuterContainer";
 import LinedButtons from "@/components/LinedButtons";
 import ActiveIndicator from "@/components/ActiveIndicator";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "@/redux/authSlice";
+
 
 const Navigation = () => {
+  const dispatch = useDispatch();
   const pathname = usePathname();
+
+  const isLoggedIn = useSelector((state) => state.auth.isAuthenticated);
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
 
   const pathLinks = [
     { pathname: "/", name: "Weather" },
-    {
-      pathname: "/auth",
-      name: "Authorization",
-    },
+    ...(!isLoggedIn ? [{ pathname: "/auth", name: "Authorization" }] : []),
   ];
 
   return (
@@ -42,8 +49,21 @@ const Navigation = () => {
           </ActiveIndicator>
         )}
       />
-      <div className={"md:absolute lg:right-8 right-4 md:block hidden"}>
-        <div className={"rounded-full bg-neutral-100 w-10 aspect-square"}></div>
+      <div className="md:absolute lg:right-8 right-4 flex items-center gap-4">
+        {isLoggedIn && (
+            <div className="py-1 px-3 rounded-lg hover:bg-gray-100 transition-colors">
+              <button
+                  onClick={handleLogout}
+                  className={`${styles.textDefault} font-medium`}
+              >
+                Log Out
+              </button>
+            </div>
+        )}
+
+        <div className={"md:block hidden"}>
+          <div className={"rounded-full bg-neutral-100 w-10 aspect-square"}></div>
+        </div>
       </div>
     </OuterContainer>
   );
