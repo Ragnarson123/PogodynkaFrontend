@@ -3,75 +3,87 @@ import Input from "@/components/Input";
 import SubmitButton from "@/components/SubmitButton";
 
 const Form = ({
-  title,
-  submitButtonTitle,
-  lowerText,
-  lowerTextLinkText,
-  fields,
-  endpoint,
-}) => {
-  const [formFields, setFormFields] = React.useState([]);
+                  title,
+                  submitButtonTitle,
+                  lowerText,
+                  lowerTextLinkText,
+                  fields,
+                  endpoint,
+                  onSubmit,
 
-  const onFormSubmit = async (e) => {
-    e.preventDefault();
-    await fetch(endpoint, {
-      ...fields.map((field) => ({ value: field.value, name: field.name })),
-    });
-  };
+              }) => {
+    const [formFields, setFormFields] = React.useState([]);
+    const onFormSubmit = async (e) => {
+        e.preventDefault();
+        console.log("Form submitted - before calling onSubmit");
+        console.log("Form fields:", formFields); // ← pokaże wszystkie pola
+        try {
+            const formData = formFields.reduce((acc, field) => {
+                acc[field.name] = field.value;
+                return acc;
+            }, {});
+            console.log("Form data:", formData); // ← to co idzie do API
 
-  const onInputChange = (e, name) => {
-    const oldField = formFields.filter((input) => input.name === name)[0];
-    const oldFieldIndex = formFields.indexOf(oldField);
+            await onSubmit(formData, endpoint);
+            console.log("Form submitted - after calling onSubmit");
+        } catch (error) {
+            console.error("Error in form submission:", error);
+        }
+    };
 
-    setFormFields((prev) =>
-      prev.toSpliced(oldFieldIndex, 1, {
-        ...oldField,
-        value: e.target.value,
-      }),
-    );
-  };
+    const onInputChange = (e, name) => {
+        const oldField = formFields.filter((input) => input.name === name)[0];
+        const oldFieldIndex = formFields.indexOf(oldField);
 
-  useEffect(() => setFormFields(fields), [fields]);
+        setFormFields((prev) =>
+            prev.toSpliced(oldFieldIndex, 1, {
+                ...oldField,
+                value: e.target.value,
+            }),
+        );
+    };
 
-  return (
-    <form className={"flex flex-col gap-4 w-full"} onSubmit={onFormSubmit}>
-      <h2 className={"text-3xl"}>{title}</h2>
+    useEffect(() => setFormFields(fields), [fields]);
 
-      {formFields.map((input, key) => (
-        <div key={key} className={"flex flex-col gap-1 group"}>
-          <label
-            htmlFor={input.name}
-            className={
-              "text-sm group-focus-within:text-purple-700 transition-all ease-in-out"
-            }
-          >
-            {input.name}
-          </label>
-          <Input
-            id={key}
-            value={input.value}
-            name={input.name}
-            onChange={(e) => onInputChange(e, input.name)}
-            placeholder={input.placeholder}
-            className={"peer"}
-          />
-        </div>
-      ))}
+    return (
+        <form className={"flex flex-col gap-4 w-full"} onSubmit={onFormSubmit}>
+            <h2 className={"text-3xl"}>{title}</h2>
 
-      <SubmitButton title={submitButtonTitle} />
+            {formFields.map((input, key) => (
+                <div key={key} className={"flex flex-col gap-1 group"}>
+                    <label
+                        htmlFor={input.name}
+                        className={
+                            "text-sm group-focus-within:text-purple-700 transition-all ease-in-out"
+                        }
+                    >
+                        {input.name}
+                    </label>
+                    <Input
+                        id={key}
+                        value={input.value}
+                        name={input.name}
+                        onChange={(e) => onInputChange(e, input.name)}
+                        placeholder={input.placeholder}
+                        className={"peer"}
+                    />
+                </div>
+            ))}
 
-      <p className={"text-sm"}>
-        {lowerText}{" "}
-        <span
-          className={
-            "text-purple-700 hover:underline hover:cursor-pointer font-semibold"
-          }
-        >
+            <SubmitButton title={submitButtonTitle} />
+
+            <p className={"text-sm"}>
+                {lowerText}{" "}
+                <span
+                    className={
+                        "text-purple-700 hover:underline hover:cursor-pointer font-semibold"
+                    }
+                >
           {lowerTextLinkText}
         </span>
-      </p>
-    </form>
-  );
+            </p>
+        </form>
+    );
 };
 
 export default Form;
